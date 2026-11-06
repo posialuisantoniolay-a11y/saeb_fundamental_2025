@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulado SAEB — Matemática · 6º Ano</title>
+<style>
+  :root {
+    --ink: #1c2430;
+    --muted: #5b6775;
+    --line: #d7dde5;
+    --bg: #f3f6f9;
+    --card: #ffffff;
+    --accent: #1d4e89;
+    --accent-soft: #e7f0fa;
+    --wrong: #b42318;
+    --wrong-soft: #fdecea;
+    --ok: #067647;
+    --ok-soft: #e8f8ef;
+    --warn: #b54708;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #d9e6f6 0%, transparent 55%),
+      radial-gradient(900px 400px at 100% 0%, #e7eef8 0%, transparent 50%),
+      var(--bg);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 28px 18px 120px; }
+  .hero {
+    background: linear-gradient(135deg, #1d4e89, #163a66 55%, #0f2744);
+    color: #fff;
+    border-radius: 20px;
+    padding: 28px 26px;
+    box-shadow: 0 16px 40px rgba(15, 39, 68, 0.22);
+    margin-bottom: 22px;
+  }
+  .hero h1 { margin: 0 0 8px; font-size: clamp(1.4rem, 3vw, 1.9rem); letter-spacing: -0.02em; }
+  .hero p { margin: 0; opacity: 0.92; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chip {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+  }
+  .toolbar {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(10px);
+    background: rgba(243,246,249,0.86);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .progress { font-weight: 600; color: var(--muted); }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    appearance: none; border: 0; cursor: pointer;
+    border-radius: 10px; padding: 10px 14px; font-weight: 650;
+    font-size: 0.95rem;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-secondary { background: #e8eef5; color: var(--ink); }
+  .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px 20px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 0 rgba(16,24,40,0.02);
+  }
+  .card[hidden] { display: none !important; }
+  .card.is-correct { border-color: #86efac; background: linear-gradient(#fff, var(--ok-soft)); }
+  .card.is-wrong { border-color: #fca5a5; background: linear-gradient(#fff, var(--wrong-soft)); }
+  .qhead { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 10px; }
+  .num { font-weight: 800; color: var(--accent); }
+  .code { font-size: 0.8rem; color: var(--muted); text-align: right; }
+  .stem { margin-bottom: 12px; }
+  .stem-note { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .fig { margin: 12px 0 16px; }
+  .fig img {
+    width: 100%; max-width: 720px; height: auto;
+    border: 1px solid var(--line); border-radius: 12px; background: #fff;
+    display: block;
+  }
+  .options { display: grid; gap: 8px; }
+  .options:has(.letter-only) {
+    grid-template-columns: repeat(4, minmax(72px, 1fr));
+  }
+  .opt {
+    display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start;
+    border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+    cursor: pointer; background: #fbfdff;
+  }
+  .opt.letter-only {
+    grid-template-columns: 1fr;
+    place-items: center;
+    min-height: 48px;
+  }
+  .opt:hover { border-color: #9eb6d4; background: var(--accent-soft); }
+  .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .letter {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; font-size: 0.85rem;
+    background: #e8eef5; color: var(--ink);
+  }
+  .opt:has(input:checked) .letter { background: var(--accent); color: #fff; }
+  .feedback {
+    margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-weight: 650;
+  }
+  .feedback.ok { background: var(--ok-soft); color: var(--ok); }
+  .feedback.bad { background: var(--wrong-soft); color: var(--wrong); }
+  .feedback.skip { background: #fff7ed; color: var(--warn); }
+  .result {
+    display: none; margin-top: 18px; padding: 18px 20px; border-radius: 16px;
+    background: #fff; border: 1px solid var(--line);
+  }
+  .result.show { display: block; }
+  .result h2 { margin: 0 0 8px; }
+  .score { font-size: 2rem; font-weight: 800; color: var(--accent); }
+  footer.note { margin-top: 24px; color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>Simulado SAEB — Matemática</h1>
+      <p>6º Ano do Ensino Fundamental · Prova com 25 questões sorteadas de um banco com 65 itens (3 simulados). Cada acesso (ou “Nova prova”) gera um conjunto diferente.</p>
+      <div class="meta">
+        <span class="chip">25 questões por prova</span>
+        <span class="chip">Banco: 65</span>
+        <span class="chip">Correção automática</span>
+      </div>
+    </header>
+    <div class="toolbar">
+      <div class="progress"><span id="answered">0</span> / <span id="totalLabel">25</span> respondidas</div>
+      <div class="btns">
+        <button type="button" class="btn-ghost" id="btnNew">Nova prova</button>
+        <button type="button" class="btn-ghost" id="btnClear">Limpar</button>
+        <button type="button" class="btn-secondary" id="btnReveal">Mostrar gabarito</button>
+        <button type="button" class="btn-primary" id="btnCheck" disabled>Corrigir</button>
+      </div>
+    </div>
+    <form id="quiz">
+      
+    <article class="card" data-id="F1_Q01" data-answer="D" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_001 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q01.png" alt="Questao F1_Q01" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q01" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q01" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q01" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q01" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q02" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_002 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q02.png" alt="Questao F1_Q02" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q02" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q02" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q02" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q02" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q03" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_003 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q03.png" alt="Questao F1_Q03" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q03" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q03" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q03" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q03" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q04" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_004 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q04.png" alt="Questao F1_Q04" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q04" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q04" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q04" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q04" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q05" data-answer="A" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_005 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q05.png" alt="Questao F1_Q05" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q05" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q05" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q05" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q05" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q06" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_006 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q06.png" alt="Questao F1_Q06" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q06" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q06" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q06" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q06" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q07" data-answer="B" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_007 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q07.png" alt="Questao F1_Q07" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q07" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q07" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q07" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q07" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q08" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_008 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q08.png" alt="Questao F1_Q08" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q08" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q08" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q08" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q08" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q09" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_009 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q09.png" alt="Questao F1_Q09" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q09" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q09" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q09" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q09" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q10" data-answer="A" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_010 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q10.png" alt="Questao F1_Q10" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q10" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q10" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q10" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q10" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q11" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_011 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q11.png" alt="Questao F1_Q11" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q11" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q11" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q11" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q11" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q12" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_012 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q12.png" alt="Questao F1_Q12" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q12" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q12" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q12" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q12" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q13" data-answer="C" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_013 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q13.png" alt="Questao F1_Q13" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q13" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q13" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q13" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q13" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q14" data-answer="A" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_014 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q14.png" alt="Questao F1_Q14" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q14" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q14" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q14" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q14" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q15" data-answer="D" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_015 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q15.png" alt="Questao F1_Q15" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q15" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q15" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q15" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q15" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q16" data-answer="D" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_016 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q16.png" alt="Questao F1_Q16" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q16" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q16" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q16" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q16" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q17" data-answer="D" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_017 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q17.png" alt="Questao F1_Q17" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q17" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q17" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q17" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q17" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q18" data-answer="B" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_018 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q18.png" alt="Questao F1_Q18" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q18" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q18" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q18" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q18" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q19" data-answer="A" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_019 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q19.png" alt="Questao F1_Q19" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q19" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q19" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q19" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q19" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q20" data-answer="B" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_020 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q20.png" alt="Questao F1_Q20" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q20" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q20" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q20" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q20" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q21" data-answer="B" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_021 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q21.png" alt="Questao F1_Q21" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q21" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q21" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q21" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q21" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F1_Q22" data-answer="D" data-source="F1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F1_MAT_022 · 1º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f1_q22.png" alt="Questao F1_Q22" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q22" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q22" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q22" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F1_Q22" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q01" data-answer="D" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_001 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q01.png" alt="Questao F2_Q01" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q01" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q01" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q01" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q01" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q02" data-answer="D" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_002 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q02.png" alt="Questao F2_Q02" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q02" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q02" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q02" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q02" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q03" data-answer="B" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_003 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q03.png" alt="Questao F2_Q03" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q03" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q03" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q03" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q03" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q04" data-answer="B" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_004 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q04.png" alt="Questao F2_Q04" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q04" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q04" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q04" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q04" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q05" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_005 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q05.png" alt="Questao F2_Q05" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q05" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q05" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q05" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q05" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q06" data-answer="B" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_006 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q06.png" alt="Questao F2_Q06" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q06" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q06" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q06" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q06" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q07" data-answer="A" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_007 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q07.png" alt="Questao F2_Q07" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q07" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q07" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q07" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q07" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q08" data-answer="D" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_008 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q08.png" alt="Questao F2_Q08" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q08" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q08" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q08" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q08" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q09" data-answer="D" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_009 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q09.png" alt="Questao F2_Q09" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q09" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q09" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q09" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q09" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q10" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_010 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q10.png" alt="Questao F2_Q10" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q10" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q10" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q10" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q10" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q11" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_011 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q11.png" alt="Questao F2_Q11" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q11" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q11" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q11" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q11" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q13" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_013 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q13.png" alt="Questao F2_Q13" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q13" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q13" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q13" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q13" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q14" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_014 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q14.png" alt="Questao F2_Q14" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q14" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q14" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q14" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q14" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q15" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_015 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q15.png" alt="Questao F2_Q15" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q15" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q15" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q15" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q15" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q16" data-answer="A" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_016 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q16.png" alt="Questao F2_Q16" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q16" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q16" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q16" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q16" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q17" data-answer="D" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_017 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q17.png" alt="Questao F2_Q17" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q17" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q17" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q17" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q17" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q18" data-answer="C" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_018 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q18.png" alt="Questao F2_Q18" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q18" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q18" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q18" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q18" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q19" data-answer="A" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_019 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q19.png" alt="Questao F2_Q19" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q19" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q19" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q19" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q19" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q20" data-answer="D" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_020 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q20.png" alt="Questao F2_Q20" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q20" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q20" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q20" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q20" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q21" data-answer="A" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_021 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q21.png" alt="Questao F2_Q21" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q21" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q21" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q21" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q21" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F2_Q22" data-answer="B" data-source="F2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F2_MAT_022 · 2º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f2_q22.png" alt="Questao F2_Q22" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q22" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q22" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q22" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F2_Q22" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q01" data-answer="C" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_001 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q01.png" alt="Questao F3_Q01" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q01" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q01" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q01" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q01" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q02" data-answer="D" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_002 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q02.png" alt="Questao F3_Q02" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q02" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q02" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q02" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q02" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q03" data-answer="B" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_003 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q03.png" alt="Questao F3_Q03" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q03" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q03" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q03" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q03" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q04" data-answer="C" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_004 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q04.png" alt="Questao F3_Q04" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q04" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q04" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q04" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q04" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q05" data-answer="C" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_005 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q05.png" alt="Questao F3_Q05" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q05" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q05" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q05" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q05" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q06" data-answer="D" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_006 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q06.png" alt="Questao F3_Q06" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q06" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q06" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q06" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q06" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q07" data-answer="D" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_007 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q07.png" alt="Questao F3_Q07" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q07" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q07" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q07" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q07" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q08" data-answer="D" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_008 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q08.png" alt="Questao F3_Q08" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q08" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q08" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q08" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q08" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q09" data-answer="A" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_009 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q09.png" alt="Questao F3_Q09" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q09" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q09" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q09" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q09" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q10" data-answer="D" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_010 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q10.png" alt="Questao F3_Q10" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q10" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q10" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q10" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q10" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q11" data-answer="A" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_011 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q11.png" alt="Questao F3_Q11" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q11" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q11" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q11" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q11" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q12" data-answer="A" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_012 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q12.png" alt="Questao F3_Q12" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q12" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q12" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q12" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q12" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q13" data-answer="B" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_013 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q13.png" alt="Questao F3_Q13" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q13" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q13" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q13" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q13" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q14" data-answer="A" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_014 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q14.png" alt="Questao F3_Q14" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q14" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q14" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q14" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q14" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q15" data-answer="B" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_015 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q15.png" alt="Questao F3_Q15" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q15" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q15" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q15" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q15" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q16" data-answer="C" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_016 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q16.png" alt="Questao F3_Q16" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q16" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q16" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q16" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q16" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q17" data-answer="D" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_017 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q17.png" alt="Questao F3_Q17" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q17" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q17" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q17" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q17" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q18" data-answer="B" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_018 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q18.png" alt="Questao F3_Q18" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q18" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q18" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q18" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q18" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q19" data-answer="C" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_019 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q19.png" alt="Questao F3_Q19" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q19" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q19" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q19" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q19" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q20" data-answer="C" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_020 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q20.png" alt="Questao F3_Q20" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q20" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q20" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q20" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q20" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q21" data-answer="A" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_021 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q21.png" alt="Questao F3_Q21" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q21" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q21" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q21" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q21" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="F3_Q22" data-answer="A" data-source="F3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_F3_MAT_022 · 3º Simulado SAEB 2025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/fund/f3_q22.png" alt="Questao F3_Q22" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q22" value="A">
+          <span class="letter">A</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q22" value="B">
+          <span class="letter">B</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q22" value="C">
+          <span class="letter">C</span>
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="F3_Q22" value="D">
+          <span class="letter">D</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    </form>
+    <section class="result" id="result">
+      <h2>Resultado</h2>
+      <div class="score"><span id="score">0</span> / <span id="scoreTotal">25</span></div>
+      <p id="scoreMsg"></p>
+    </section>
+    <footer class="note">Fontes: 1º, 2º e 3º Simulados SAEB 2025 SC — Matemática, 6º ano do Ensino Fundamental. A questão 12 do 2º simulado foi anulada e não entra no banco. As figuras foram recortadas das provas originais.</footer>
+  </div>
+<script>
+const TOTAL_PROVA = 25;
+const form = document.getElementById('quiz');
+const answeredEl = document.getElementById('answered');
+const result = document.getElementById('result');
+const scoreEl = document.getElementById('score');
+const scoreMsg = document.getElementById('scoreMsg');
+
+function visibleCards() {
+  return [...form.querySelectorAll('.card')].filter(c => !c.hidden);
+}
+function countAnswered() {
+  const cards = visibleCards();
+  let n = 0;
+  cards.forEach(card => {
+    if (card.querySelector('input:checked')) n++;
+  });
+  answeredEl.textContent = n;
+  const btn = document.getElementById('btnCheck');
+  const ready = cards.length > 0 && n === cards.length;
+  btn.disabled = !ready;
+  btn.title = ready ? '' : 'Marque todas as questões para corrigir';
+}
+form.addEventListener('change', countAnswered);
+function resetStyles() {
+  form.querySelectorAll('.card').forEach(card => {
+    card.classList.remove('is-correct', 'is-wrong');
+    const fb = card.querySelector('.feedback');
+    fb.hidden = true;
+    fb.className = 'feedback';
+    fb.textContent = '';
+    card.querySelectorAll('input[type=radio]').forEach(r => { r.checked = false; });
+  });
+  result.classList.remove('show');
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function novaProva() {
+  const all = [...form.querySelectorAll('.card')];
+  all.forEach(c => { c.hidden = true; });
+  resetStyles();
+  const picked = shuffle(all).slice(0, TOTAL_PROVA);
+  picked.forEach((card, i) => {
+    card.hidden = false;
+    card.querySelector('.num').textContent = 'Questão ' + (i + 1);
+    form.appendChild(card);
+  });
+  countAnswered();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.getElementById('btnNew').addEventListener('click', () => {
+  if (confirm('Sortear uma nova prova com outras questões? As respostas atuais serão apagadas.')) {
+    novaProva();
+  }
+});
+document.getElementById('btnClear').addEventListener('click', () => {
+  resetStyles();
+  countAnswered();
+});
+document.getElementById('btnReveal').addEventListener('click', () => {
+  visibleCards().forEach(card => {
+    const ans = card.dataset.answer;
+    const fb = card.querySelector('.feedback');
+    fb.hidden = false;
+    fb.className = 'feedback ok';
+    fb.textContent = 'Gabarito: ' + ans;
+  });
+});
+document.getElementById('btnCheck').addEventListener('click', () => {
+  const cards = visibleCards();
+  const answered = cards.filter(card => card.querySelector('input:checked')).length;
+  if (answered !== cards.length) return;
+  let score = 0, blank = 0;
+  cards.forEach(card => {
+    const ans = card.dataset.answer;
+    const chosen = card.querySelector('input:checked');
+    const fb = card.querySelector('.feedback');
+    card.classList.remove('is-correct', 'is-wrong');
+    fb.hidden = false;
+    if (!chosen) {
+      blank++;
+      fb.className = 'feedback skip';
+      fb.textContent = 'Sem resposta. Gabarito: ' + ans;
+      return;
+    }
+    if (chosen.value === ans) {
+      score++;
+      card.classList.add('is-correct');
+      fb.className = 'feedback ok';
+      fb.textContent = 'Correto!';
+    } else {
+      card.classList.add('is-wrong');
+      fb.className = 'feedback bad';
+      fb.textContent = 'Incorreto. Você marcou ' + chosen.value + '. Gabarito: ' + ans;
+    }
+  });
+  scoreEl.textContent = score;
+  const total = cards.length || TOTAL_PROVA;
+  const pct = Math.round((score / total) * 100);
+  scoreMsg.textContent = blank
+    ? `Acertos: ${score} (${pct}%). Em branco: ${blank}.`
+    : `Acertos: ${score} (${pct}%).`;
+  result.classList.add('show');
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+novaProva();
+</script>
+</body>
+</html>
